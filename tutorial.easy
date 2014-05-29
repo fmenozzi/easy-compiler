@@ -1,0 +1,106 @@
+##
+This is an example program that highlights the
+features of the Easy programming language. 
+
+As you've likely guessed, mult-line comments start and end
+with the double-pound sign; single-line comments start with
+the pound sign and continue until the end of the line.
+
+The entry point for Easy programs is the main block, of
+which there can only be one. Outside of the main block, 
+you can declare any number of functions and structures, in
+any order.
+
+Running this tutorial will print the integers 1 through 10
+##
+
+main
+
+	# 1. Simple println
+	println(1);
+
+	# 2. Simple literal
+	int x = 2;
+	println(x);
+
+	# 3. Simple expression
+	x = 2*x - x + 1;
+	println(3);
+
+	# 4. Simple conditional statement
+	if x equals 3
+		x = 4;
+	else if x equals 4
+		println("How did we get here?");
+		x = -1;
+	else
+		println("How did we POSSIBLY get here?");
+		x = -1;
+	end
+	println(x);
+
+	# 5. While loop
+	int i = 0;
+    while i < 5
+    	i = i + 1;
+    	x = i;
+   	end
+   	println(x);
+
+   	# 6. For loop
+   	for int j from 1 to 6
+   		x = j;
+   	end
+   	println(x);
+
+   	# 7. Another For loop
+   	for int j from 1 to 7 by 2
+   		x = j;
+   	end
+   	println(x);
+
+   	# 8. Simple function call (void)
+   	print_8();
+
+   	# 9. Simple function call (non-void)
+   	boolean isEven = even(10);
+   	if isEven
+   		println(9);
+   	else
+   		println(-1);
+   	end
+
+   	# 10. Structure instantiation
+   	SimpleObject obj = new SimpleObject(10, 0.5);
+   	if obj.integer equals 10 and obj.real < 1.0
+   		println(obj.integer);
+   	else
+   		println(-1);
+   	end
+
+end
+
+##
+Structs in Easy behave identically to structs in C, 
+with the added feature that the compiler supplies a 
+"constructor" for initializing the fields.
+##
+
+struct SimpleObject
+	int integer;
+	double real;
+end
+
+##
+Functions in Easy behave similarly to functions in C, in 
+the sense that they are free-floating and not tied to a 
+particular object (unlike methods). 
+##
+
+function print_8()
+	println(8);
+end
+
+function boolean = even(int num)
+	return num mod 2 equals 0;
+end
