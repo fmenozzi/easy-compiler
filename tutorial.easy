@@ -41,9 +41,9 @@ main
 
 	# 5. While loop
 	int i = 0;
-    while i < 5
-    	i = i + 1;
-    	x = i;
+	while i < 5
+		i = i + 1;
+	    	x = i;
    	end
    	println(x);
 
