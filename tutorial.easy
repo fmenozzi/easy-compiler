@@ -11,6 +11,8 @@ which there can only be one. Outside of the main block,
 you can declare any number of functions and structures, in
 any order.
 
+Semicolons at the end of statements are optional.
+
 Running this tutorial will print the integers 1 through 10
 ##
 

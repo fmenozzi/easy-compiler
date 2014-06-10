@@ -56,7 +56,7 @@ public class Parser {
 		if (token.kind == expectedKind)
 			token = scanner.scan();
 		else 
-			parseError("At line " + token.line + ": Expecting " + expectedKind + " but found " + token.kind);
+			parseError(token.line.lineNumber, "Expecting " + expectedKind + " but found " + token.kind);
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class Parser {
 			token = scanner.scan();
 		} else {
 			Token t = new Token(expectedKind, expectedSpelling, new Line(scanner.lineNumber()));
-			parseError("At line " + token.line + ": Expecting \"" + t + "\" but found \"" + token + "\"");
+			parseError(token.line.lineNumber, "Expecting \"" + t + "\" but found \"" + token + "\"");
 		}
 	}
 	
@@ -90,8 +90,8 @@ public class Parser {
 	 * @param errorMessage	the error message
 	 * @throws SyntaxError
 	 */
-	private void parseError(String errorMessage) throws SyntaxError {
-        reporter.addParseError(errorMessage);
+	private void parseError(int lineNumber, String errorMessage) throws SyntaxError {
+        reporter.addParseError(lineNumber, errorMessage);
         throw new SyntaxError();
     }
 	
@@ -127,11 +127,11 @@ public class Parser {
 			} else if (token.spelling.equals("struct")) {
 				sdl.add(parseStructDeclaration());
 			} else {
-				parseError("At line "+token.line+": Unrecognized token");
+				parseError(token.line.lineNumber, "Unrecognized token");
 			}
 			
 			if (token.kind == TokenKind.EOF)
-				parseError("At line "+token.line+": Missing main block");
+				parseError(token.line.lineNumber, "Missing main block");
 		}
 		
 		Line mainLine = token.line;
@@ -144,7 +144,7 @@ public class Parser {
 			} else if (token.spelling.equals("struct")) {
 				sdl.add(parseStructDeclaration());
 			} else {
-				parseError("At line "+token.line+": Unrecognized token");
+				parseError(token.line.lineNumber, "Unrecognized token");
 			}
 		}
 		
@@ -276,7 +276,7 @@ public class Parser {
 		
 		accept(TokenKind.IDEN);				// id
 		
-		accept(TokenKind.SEMICOL);			// ;
+		if (token.kind == TokenKind.SEMICOL) acceptIt();			// ;
 		
 		boolean isPrivate = false;
 		boolean isStatic  = false;
@@ -437,7 +437,6 @@ public class Parser {
     			ArrayList<ElseIfStmt> elseIfStmts = new ArrayList<ElseIfStmt>();
     			ElseStmt elseStmt				  = null;
     			
-    			// TODO FINISH!
     			while (token.spelling.equals("else")) {
     				Line elseLine = token.line;
     				acceptIt();
@@ -497,7 +496,7 @@ public class Parser {
 
     			Expression expr = parseExpression();
 
-    			accept(TokenKind.SEMICOL);
+    			if (token.kind == TokenKind.SEMICOL) acceptIt();
 
     			return new VarDeclStmt(decl, expr, decl.line);
     		} else if (token.spelling.equals("return")) {
@@ -508,7 +507,7 @@ public class Parser {
     				return new ReturnStmt(null, returnLine);
     			} else {
     				Expression returnExpr = parseExpression();
-    				accept(TokenKind.SEMICOL);
+    				if (token.kind == TokenKind.SEMICOL) acceptIt();
     				return new ReturnStmt(returnExpr, returnLine);
     			}
     		} else if (token.spelling.equals("for")) {
@@ -553,30 +552,12 @@ public class Parser {
     				
     				return new ForEachStmt(iterId, iterType, collection, new BlockStmt(body, blockLine), forLine);
     			}
-    		} else if (token.spelling.equals("break")) {
+    		} else { // "break"
     			Line breakLine = token.line;
     			acceptIt();
-    			accept(TokenKind.SEMICOL);
+    			if (token.kind == TokenKind.SEMICOL) acceptIt();
     			return new BreakStmt(breakLine);
-    		} else {	// "java"
-    			Line javaLine = token.line;
-
-    			acceptIt();												// java
-
-    			ArrayList<StringLiteral> javaStmts = new ArrayList<StringLiteral>();
-
-    			javaStmts.add(new StringLiteral(token.spelling, token.line));
-    			accept(TokenKind.STRLIT);								// JavaStmt
-
-    			while (! token.spelling.equals("end")) {
-    				javaStmts.add(new StringLiteral(token.spelling, token.line));
-    				accept(TokenKind.STRLIT);							// JavaStmt*
-    			}
-
-    			accept(TokenKind.KEYWORD, "end");						// end
-
-    			return new JavaBlockStmt(javaStmts, javaLine);
-    		}
+    		} 
     	} else {	// id
     		Identifier typeId = new Identifier(token.spelling, new Line(scanner.lineNumber()));
 
@@ -591,7 +572,7 @@ public class Parser {
 
     			Expression expr = parseExpression();
 
-    			accept(TokenKind.SEMICOL);
+    			if (token.kind == TokenKind.SEMICOL) acceptIt();
 
     			return new VarDeclStmt(decl, expr, new Line(scanner.lineNumber()));
     		} else if (token.kind == TokenKind.LBRACKET) { // id[Expr] (.id([Expr])?)* (= Expr; | (ArgList?);)
@@ -621,7 +602,7 @@ public class Parser {
     			if (token.kind == TokenKind.ASSIGN) {
     				acceptIt();
     				Expression expr = parseExpression();
-    				accept(TokenKind.SEMICOL);
+    				if (token.kind == TokenKind.SEMICOL) acceptIt();
 
     				return new AssignStmt(ref, expr, new Line(scanner.lineNumber()));
     			} else {
@@ -632,7 +613,7 @@ public class Parser {
     					args = parseArgumentList();
     				accept(TokenKind.RPAREN);
 
-    				accept(TokenKind.SEMICOL);
+    				if (token.kind == TokenKind.SEMICOL) acceptIt();
 
     				return new CallStmt(ref, args, new Line(scanner.lineNumber()));
     			}
@@ -660,7 +641,7 @@ public class Parser {
     			if (token.kind == TokenKind.ASSIGN) { // AssignStmt
     				accept(TokenKind.ASSIGN);
     				Expression expr = parseExpression();
-    				accept(TokenKind.SEMICOL);
+    				if (token.kind == TokenKind.SEMICOL) acceptIt();
 
     				return new AssignStmt(ref, expr, new Line(scanner.lineNumber()));
     			} else {								// CallStmt
@@ -671,14 +652,14 @@ public class Parser {
     					args = parseArgumentList();
     				accept(TokenKind.RPAREN);
 
-    				accept(TokenKind.SEMICOL);
+    				if (token.kind == TokenKind.SEMICOL) acceptIt();
 
     				return new CallStmt(ref, args, new Line(scanner.lineNumber()));
     			}
     		} else if (token.kind == TokenKind.ASSIGN) {
     			accept(TokenKind.ASSIGN);
     			Expression expr = parseExpression();
-    			accept(TokenKind.SEMICOL);
+    			if (token.kind == TokenKind.SEMICOL) acceptIt();
 
     			Reference ref = new IdRef(typeId, new Line(scanner.lineNumber()));
     			return new AssignStmt(ref, expr, new Line(scanner.lineNumber()));
@@ -690,7 +671,7 @@ public class Parser {
     				args = parseArgumentList();
     			accept(TokenKind.RPAREN);
 
-    			accept(TokenKind.SEMICOL);
+    			if (token.kind == TokenKind.SEMICOL) acceptIt();
 
     			Reference ref = new IdRef(typeId, new Line(scanner.lineNumber()));
     			return new CallStmt(ref, args, new Line(scanner.lineNumber()));

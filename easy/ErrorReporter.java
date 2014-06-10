@@ -29,8 +29,8 @@ public class ErrorReporter {
 	 * 
 	 * @param message
 	 */
-	public void addScanError(String message) {
-		scanErrors.add(message);
+	public void addScanError(int lineNumber, String message) {
+		scanErrors.add("At line " + lineNumber + ": " + message);
 	}	
 
 	/**
@@ -38,8 +38,8 @@ public class ErrorReporter {
 	 * 
 	 * @param message
 	 */
-	public void addParseError(String message) {
-		parseErrors.add(message);
+	public void addParseError(int lineNumber, String message) {
+		parseErrors.add("At line " + lineNumber + ": " + message);
 	}
 	
 	/**

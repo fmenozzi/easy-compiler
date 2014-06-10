@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import easy.SyntacticAnalyzer.Line;
 import easy.SyntacticAnalyzer.Token;
@@ -76,14 +74,6 @@ public class Scanner {
 	private HashSet<String> relops;
 	
 	/**
-	 * Queue for storing Java statements; 
-	 * keyword tokens for "java" and "end"
-	 * and string literals for the Java
-	 * statements in between 
-	 */
-	private Queue<Token> javaStatements;
-	
-	/**
 	 * Main method used for debugging 
 	 * 
 	 * @param args	the list of command-line args, the first being the source path
@@ -134,9 +124,7 @@ public class Scanner {
 	public Scanner(InputStream inputStream, ErrorReporter reporter) {
 		this.inputStream = inputStream;
 		this.reporter 	 = reporter;
-		
-		javaStatements = new LinkedList<Token>();
-		
+				
 		keywords = new HashSet<String>();
 		keywords.add("class");
 		keywords.add("struct");
@@ -195,10 +183,6 @@ public class Scanner {
 		// Check for EOF flag
 		if (isEOF)
 			return new Token(TokenKind.EOF, "EOF", new Line(lineNumber));
-		
-		// If there are Java statements to return, return them
-		if (!javaStatements.isEmpty())
-			return javaStatements.remove();
 
 		// Identify keywords and identifiers
 		if (isAlphaChar(currentChar)) {
@@ -207,43 +191,6 @@ public class Scanner {
 			while (isAlphaChar(currentChar) || isDigit(currentChar) || isUnderscore(currentChar)) {
 				word += currentChar;
 				takeIt();
-			}
-			
-			// Collect all statements following keyword "java"
-			if (word.equals("java")) {
-				javaStatements.add(new Token(TokenKind.KEYWORD, "java", new Line(lineNumber)));
-				
-				passThroughWhitespace();
-				
-				String statement = "";
-				while (! statement.equals("end")) {
-					statement = "";
-					while (currentChar != ';') {
-						statement += currentChar;
-						takeIt();
-						
-						if (statement.equals("end")) {
-							javaStatements.add(new Token(TokenKind.KEYWORD, "end", new Line(lineNumber)));
-							break;
-						}
-					}
-					
-					if (!statement.equals("end")) {
-						statement += currentChar;	// ;
-						takeIt();
-						
-						passThroughWhitespace();
-						
-						javaStatements.add(new Token(TokenKind.STRLIT, statement, new Line(lineNumber)));
-					}
-					
-					if (isEOF) {
-						scanError("At line "+lineNumber+": Unterminated \"java\" block!");
-						return new Token(TokenKind.ERROR, "ERROR", new Line(lineNumber));
-					}
-				}
-				
-				return javaStatements.remove();
 			}
 
 			// Perform lookup to disambiguate "word"
@@ -289,8 +236,8 @@ public class Scanner {
 			if ((temp == '+' && currentChar == '+') || 
 				(temp == '-' && currentChar == '-')) {
 				// Deny ++ and --
-				errorStr = "At line "+lineNumber+": ++ not allowed in Easy!";
-				scanError(errorStr);
+				errorStr = "++ not allowed in Easy!";
+				scanError(lineNumber, errorStr);
 				return new Token(TokenKind.ERROR, Character.toString(temp), new Line(lineNumber));
 			} else {
 				return new Token(TokenKind.ARITHOP, Character.toString(temp), new Line(lineNumber));
@@ -337,8 +284,8 @@ public class Scanner {
 				takeIt();
 				return new Token(TokenKind.LOGOP, "&&", new Line(lineNumber));
 			} else {
-				errorStr = "At line " + Integer.toString(lineNumber) + ": Single & not allowed in Easy!";
-				scanError(errorStr);
+				errorStr = "Single & not allowed in Easy!";
+				scanError(lineNumber, errorStr);
 				return new Token(TokenKind.ERROR, errorStr, new Line(lineNumber));
 			}
 			
@@ -349,8 +296,8 @@ public class Scanner {
 				takeIt();
 				return new Token(TokenKind.LOGOP, "||", new Line(lineNumber));
 			} else {
-				errorStr = "At line " + Integer.toString(lineNumber) + ": Single | not allowed in Easy!";
-				scanError(errorStr);
+				errorStr = "Single | not allowed in Easy!";
+				scanError(lineNumber, errorStr);
 				return new Token(TokenKind.ERROR, errorStr, new Line(lineNumber));
 			}
 
@@ -405,8 +352,8 @@ public class Scanner {
 					}
 					return new Token(TokenKind.FLOATLIT, numstr+"."+floatstr, new Line(lineNumber));
 				} else {
-					errorStr = "At line "+lineNumber+": Floats must have numbers on either side of the point!";
-					scanError(errorStr);
+					errorStr = "Floats must have numbers on either side of the point!";
+					scanError(lineNumber, errorStr);
 					return new Token(TokenKind.ERROR, errorStr, new Line(lineNumber));
 				}
 			} else {
@@ -424,8 +371,8 @@ public class Scanner {
 		case '.':
 			takeIt();
 			if (isDigit(currentChar)) {
-				errorStr = "At line "+lineNumber+": Floats must have numbers on either side of the point!";
-				scanError(errorStr);
+				errorStr = "Floats must have numbers on either side of the point!";
+				scanError(lineNumber, errorStr);
 				return new Token(TokenKind.ERROR, errorStr, new Line(lineNumber));
 			} else {
 				return new Token(TokenKind.DOT, ".", new Line(lineNumber));
@@ -433,12 +380,12 @@ public class Scanner {
 			
 		case '_':
 			takeIt();
-			errorStr = "At line "+lineNumber+": Identifiers cannot start with an underscore!";
-			scanError(errorStr);
+			errorStr = "Identifiers cannot start with an underscore!";
+			scanError(lineNumber, errorStr);
 			return new Token(TokenKind.ERROR, errorStr, new Line(lineNumber));
 			
 		default:
-			scanError("At line " + Integer.toString(lineNumber) + ": Unrecognized character in input");
+			scanError(lineNumber, "Unrecognized character in input");
 			errorStr = "ASCII: " + Integer.toString((int)currentChar);
 			return new Token(TokenKind.ERROR, errorStr, new Line(lineNumber));
 		}
@@ -463,11 +410,11 @@ public class Scanner {
             if (c == -1) {
             	currentChar = '\0';
             	isEOF = true;
-            }
-            else
+            } else {
             	currentChar = (char) c;
+            }
         } catch (IOException e) {
-            scanError("At line " + lineNumber + ": I/O Exception!");
+            scanError(lineNumber, "I/O Exception!");
             currentChar = '\0';
             isEOF = true;
         }
@@ -503,7 +450,7 @@ public class Scanner {
 						}
 
 						if (isEOF) {
-							scanError("At line " + lineNumber + ": Unterminated block comment");
+							scanError(lineNumber, "Unterminated block comment");
 							break;
 						}
 					}
@@ -540,7 +487,7 @@ public class Scanner {
 		return currentChar == '#';
 	}
 	
-	private void scanError(String m) {
-    	reporter.addScanError(m);
+	private void scanError(int lineNumber, String errorMessage) {
+    	reporter.addScanError(lineNumber, errorMessage);
     }
 }

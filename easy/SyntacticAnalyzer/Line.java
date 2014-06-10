@@ -11,15 +11,15 @@ public class Line {
 	/**
 	 * Line number in source code
 	 */
-	public final int line;
+	public final int lineNumber;
 
 	/**
 	 * Construct a Line at the given line in source
 	 * 
 	 * @param line	the given line number in source
 	 */
-	public Line(int line) {
-		this.line = line;
+	public Line(int lineNumber) {
+		this.lineNumber = lineNumber;
 	}
 
 	/**
@@ -29,6 +29,6 @@ public class Line {
 	 */
 	@Override
 	public String toString() {
-		return Integer.toString(line);
+		return Integer.toString(lineNumber);
 	}
 }

@@ -301,7 +301,7 @@ public class Generator implements Visitor<String, Object> {
 		stmt.fromExpr.visit(this, "");
 		write("; ");
 		
-		write(stmt.loopVar.spelling + " <= ");
+		write(stmt.loopVar.spelling + " <= ");	// TODO Does not allow for counting DOWN!
 		stmt.toExpr.visit(this, "");
 		write("; ");
 		
