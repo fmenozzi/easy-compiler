@@ -395,14 +395,6 @@ public class ASTDisplay implements Visitor<String, Object> {
 		return null;
 	}
 
-	@Override
-	public Object visitJavaBlockStmt(JavaBlockStmt stmt, String arg) {
-		show(arg, stmt);
-		for (StringLiteral statement : stmt.statements)
-			statement.visit(this, indent(arg));
-		return null;
-	}
-
 	/**
      * Print textual representation of a Unary Expression
      * 

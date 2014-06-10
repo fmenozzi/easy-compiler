@@ -338,12 +338,6 @@ public class Generator implements Visitor<String, Object> {
 	}
 
 	@Override
-	public Object visitJavaBlockStmt(JavaBlockStmt stmt, String arg) {
-		// TODO Implement me!
-		return null;
-	}
-
-	@Override
 	public Object visitUnaryExpr(UnaryExpr expr, String arg) {
 		write(arg + "(");
 		expr.operator.visit(this, "");
