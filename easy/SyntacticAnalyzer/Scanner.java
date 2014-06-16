@@ -215,10 +215,17 @@ public class Scanner {
 		String errorStr;
 		switch (currentChar) {
 		case '"':
-			// Handle string literals
+		case '\'':
+			// Handle string literals (can begin with single or double quotes)
 			String strlit = "";
+			temp = currentChar;
 			takeIt();
-			while (currentChar != '"') {
+			while (currentChar != temp) {
+				if (isEOF) {
+					errorStr = "Unterminated string";
+					scanError(lineNumber, errorStr);
+					return new Token(TokenKind.ERROR, errorStr, new Line(lineNumber));
+				}
 				strlit += Character.toString(currentChar);
 				takeIt();
 			}
