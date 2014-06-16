@@ -13,6 +13,8 @@ any order.
 
 Semicolons at the end of statements are optional.
 
+Strings can begin with either a single or double quote
+
 Running this tutorial will print the integers 1 through 10
 ##
 
