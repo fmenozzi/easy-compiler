@@ -27,7 +27,7 @@ public class easyc {
 				
 		InputStream inputStream = null;
 		if (args.length != 1) {
-			System.out.println("Usage: java easyc <filepath>");
+			System.out.println("Usage: java -jar path/to/easyc.java path/to/source.easy");
 			System.exit(1);
 		} else {
 			try {
