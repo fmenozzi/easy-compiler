@@ -224,8 +224,8 @@ public class Generator implements Visitor<String, Object> {
 			for (Expression argument : stmt.argList)
 				argument.visit(this, "");
 			writeln(");");
-		} else if (stmt.functionRef.spelling.equals("sqrt")) {
-			write(arg + "Math.sqrt(");
+		} else if (stmt.functionRef.spelling.equals("print")) {
+			write(arg + "System.out.print(");
 			for (Expression argument : stmt.argList)
 				argument.visit(this, "");
 			writeln(");");
