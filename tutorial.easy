@@ -68,11 +68,8 @@ main
 
    	# 9. Simple function call (non-void)
    	boolean isEven = even(10);
-   	if isEven
-   		println(9);
-   	else
-   		println(-1);
-   	end
+   	int numToPrint = 9 if isEven else -1;
+	println(numToPrint);
 
    	# 10. Structure instantiation
    	SimpleObject obj = new SimpleObject(10, 0.5);

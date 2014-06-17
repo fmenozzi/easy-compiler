@@ -495,6 +495,23 @@ public class ASTDisplay implements Visitor<String, Object> {
         
         return null;
 	}
+	
+	/**
+     * Print textual representation of an IfExpr
+     * 
+     * @param prog	the If Expression
+     * @param arg	the prefix String 
+     */
+	@Override
+	public Object visitIfExpr(IfExpr expr, String arg) {
+		show(arg, expr);
+		
+		expr.thenExpr.visit(this, indent(arg));
+		expr.condition.visit(this, indent(arg));
+		expr.elseExpr.visit(this, indent(arg));
+		
+		return null;
+	}
 
 	/**
      * Print textual representation of a Qualified Reference

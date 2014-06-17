@@ -679,6 +679,10 @@ public class Parser {
     	}
     }
     
+    
+    
+    //TODO ADD TOP-LEVEL RULE FOR IF-EXPR!
+    
     /*
      * Expression ::= A (|| A)*
      * A ::= B (&& B)*
@@ -686,17 +690,29 @@ public class Parser {
      * C ::= D (< D | > D | <= D | >= D)*
      * D ::= E (+ E | - E)*
      * E ::= F (* F | / F | % F)*
-     * F ::= num | string | true | false | null | (Expr) | -F | !F | new id( ArgList? )
+     * F ::= num | string | true | false | null | (Expr) | -F | !F | 
+     * 		 new id( ArgList? ) | CallExpr | IfExpr | RefExpr
      */
     
     private Expression parseExpression() {
     	Expression expr = parseA();
+    	
     	while (token.spelling.equals("or") || token.spelling.equals("||")) {
     		Operator op = new Operator(token, new Line(scanner.lineNumber()));
     		acceptIt();
     		expr = new BinaryExpr(expr, op, parseA(), new Line(scanner.lineNumber()));
     	}
-    	return expr;
+    	
+    	if (token.spelling.equals("if")) {
+    		acceptIt();
+			Expression thenExpr = expr;
+			Expression condition = parseExpression();
+			accept(TokenKind.KEYWORD, "else");
+			Expression elseExpr = parseExpression();
+			return new IfExpr(thenExpr, condition, elseExpr, thenExpr.line);
+    	} else {
+    		return expr;
+    	}
     }
     
     private Expression parseA() {
@@ -799,13 +815,14 @@ public class Parser {
     		
     		return new NewObjectExpr(new RefType(id, id.line), args, newLine);
     	} else { // Reference (ArgList?)? 
-    		Reference ref = parseReference();    		
+    		Reference ref = parseReference();   
     		if (token.kind == TokenKind.LPAREN) {
     			ExprList exprList = new ExprList();
     			accept(TokenKind.LPAREN);
 				if (token.kind != TokenKind.RPAREN)
 					exprList = parseArgumentList();
     			accept(TokenKind.RPAREN);
+    		
     			return new CallExpr(ref, exprList, new Line(scanner.lineNumber()));
     		} else {
     			return new RefExpr(ref, new Line(scanner.lineNumber()));

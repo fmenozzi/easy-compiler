@@ -398,6 +398,18 @@ public class Generator implements Visitor<String, Object> {
 			
 		return null;
 	}
+	
+	@Override
+	public Object visitIfExpr(IfExpr expr, String arg) {
+		write(arg + "(");
+		expr.condition.visit(this, "");
+		write(" ? ");
+		expr.thenExpr.visit(this, "");
+		write(" : ");
+		expr.elseExpr.visit(this, "");
+		write(")");
+		return null;
+	}
 
 	@Override
 	public Object visitQualifiedRef(QualifiedRef ref, String arg) {
