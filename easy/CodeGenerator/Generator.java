@@ -290,7 +290,7 @@ public class Generator implements Visitor<String, Object> {
 		
 		stmt.body.visit(this, tab(arg));
 		
-		writeln("\n" + arg + "}");
+		writeln(arg + "}");
 		
 		return null;
 	}
@@ -322,10 +322,21 @@ public class Generator implements Visitor<String, Object> {
 		// TODO Implement me!
 		return null;
 	}
+	
+	@Override
+	public Object visitInfiniteLoopStmt(InfiniteLoopStmt stmt, String arg) {
+		writeln(arg + "while (true) {");
+		
+		stmt.body.visit(this, tab(arg));
+		
+		writeln(arg + "}");
+		
+		return null;
+	}
 
 	@Override
 	public Object visitBreakStmt(BreakStmt stmt, String arg) {
-		writeln("break;");
+		writeln(arg + "break;");
 		return null;
 	}
 
