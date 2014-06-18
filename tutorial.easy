@@ -63,17 +63,26 @@ main
    	end
    	println(x);
 
-   	# 8. Simple function call (void)
-   	print_8();
+	# 8. Infinite Loop
+	i = 0
+	loop
+		if i equals 8
+			println(i)
+			break
+		end
+	end
 
-   	# 9. Simple function call (non-void)
+   	# 9. Simple function call (void)
+   	print_9();
+
+   	# 10. Simple function call (non-void)
    	boolean isEven = even(10);
    	int numToPrint = 9 if isEven else -1;
 	println(numToPrint);
 
-   	# 10. Structure instantiation
-   	SimpleObject obj = new SimpleObject(10, 0.5);
-   	if obj.integer equals 10 and obj.real < 1.0
+   	# 11. Structure instantiation
+   	SimpleObject obj = new SimpleObject(11, 0.5);
+   	if obj.integer equals 11 and obj.real < 1.0
    		println(obj.integer);
    	else
    		println(-1);
@@ -98,8 +107,8 @@ the sense that they are free-floating and not tied to a
 particular object (unlike methods). 
 ##
 
-function print_8()
-	println(8);
+function print_9()
+	println(9);
 end
 
 function boolean = even(int num)

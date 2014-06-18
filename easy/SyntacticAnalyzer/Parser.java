@@ -552,6 +552,17 @@ public class Parser {
     				
     				return new ForEachStmt(iterId, iterType, collection, new BlockStmt(body, blockLine), forLine);
     			}
+    		} else if (token.spelling.equals("loop")) {
+    			Line loopLine = token.line;
+    			acceptIt();
+    			
+    			StatementList body = new StatementList();
+    			Line blockLine = token.line;
+    			while (! token.spelling.equals("end"))
+    				body.add(parseStatement());				
+    			accept(TokenKind.KEYWORD, "end");
+    			
+    			return new InfiniteLoopStmt(new BlockStmt(body, blockLine), loopLine);
     		} else { // "break"
     			Line breakLine = token.line;
     			acceptIt();

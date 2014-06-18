@@ -368,6 +368,13 @@ public class ASTDisplay implements Visitor<String, Object> {
 		
 		return null;
 	}
+	
+	@Override
+	public Object visitInfiniteLoopStmt(InfiniteLoopStmt stmt, String arg) {
+		show(arg, stmt);
+		stmt.body.visit(this, indent(arg));
+		return null;
+	}
 
 	/**
      * Print textual representation of a Break Statement
