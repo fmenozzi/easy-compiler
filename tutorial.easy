@@ -70,6 +70,7 @@ main
 			println(i)
 			break
 		end
+		i = i + 1
 	end
 
    	# 9. Simple function call (void)
