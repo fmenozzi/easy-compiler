@@ -146,6 +146,7 @@ public class Scanner {
 		keywords.add("while");
 		keywords.add("for");
 		keywords.add("loop");
+		keywords.add("until");
 		keywords.add("in");
 		keywords.add("from");
 		keywords.add("by");

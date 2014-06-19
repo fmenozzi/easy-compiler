@@ -369,11 +369,31 @@ public class ASTDisplay implements Visitor<String, Object> {
 		return null;
 	}
 	
+	/**
+     * Print textual representation of an Infinite Loop Statement
+     * 
+     * @param prog	the Infinite Loop Statement
+     * @param arg	the prefix String 
+     */
 	@Override
 	public Object visitInfiniteLoopStmt(InfiniteLoopStmt stmt, String arg) {
 		show(arg, stmt);
 		stmt.body.visit(this, indent(arg));
 		return null;
+	}
+	
+	/**
+     * Print textual representation of an Until Statement
+     * 
+     * @param prog	the Until Statement
+     * @param arg	the prefix String 
+     */
+	@Override
+	public Object visitUntilStmt(UntilStmt stmt, String arg) {
+		show(arg, stmt);
+        stmt.condition.visit(this, indent(arg));
+        stmt.body.visit(this, indent(arg));
+        return null;
 	}
 
 	/**

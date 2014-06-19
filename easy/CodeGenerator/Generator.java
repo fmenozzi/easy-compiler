@@ -333,6 +333,19 @@ public class Generator implements Visitor<String, Object> {
 		
 		return null;
 	}
+	
+	@Override
+	public Object visitUntilStmt(UntilStmt stmt, String arg) {
+		write(arg + "while (!(");
+		stmt.condition.visit(this, "");
+		writeln(")) {");
+		
+		stmt.body.visit(this, tab(arg));
+		
+		writeln(arg + "}");
+		
+		return null;
+	}
 
 	@Override
 	public Object visitBreakStmt(BreakStmt stmt, String arg) {

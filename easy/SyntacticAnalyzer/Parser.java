@@ -483,7 +483,6 @@ public class Parser {
     			accept(TokenKind.KEYWORD, "end");			// end
 
     			return new WhileStmt(condition, new BlockStmt(body, blockLine), whileLine);
-
     		} else if (token.spelling.equals("int")  ||
     				token.spelling.equals("float")   ||
     				token.spelling.equals("boolean") ||
@@ -563,6 +562,19 @@ public class Parser {
     			accept(TokenKind.KEYWORD, "end");
     			
     			return new InfiniteLoopStmt(new BlockStmt(body, blockLine), loopLine);
+    		} else if (token.spelling.equals("until")) {
+    			Line untilLine = token.line;
+
+    			acceptIt();									// until
+    			Expression condition = parseExpression();	// Expression
+    			StatementList body = new StatementList();
+
+    			Line blockLine = token.line;
+    			while (! token.spelling.equals("end"))
+    				body.add(parseStatement());				// Statement
+    			accept(TokenKind.KEYWORD, "end");			// end
+
+    			return new UntilStmt(condition, new BlockStmt(body, blockLine), untilLine);
     		} else { // "break"
     			Line breakLine = token.line;
     			acceptIt();
@@ -689,20 +701,16 @@ public class Parser {
     		}
     	}
     }
-    
-    
-    
-    //TODO ADD TOP-LEVEL RULE FOR IF-EXPR!
-    
+        
     /*
-     * Expression ::= A (|| A)*
+     * Expression ::= A (|| A)* (if Expr else Expr)?
      * A ::= B (&& B)*
      * B ::= C (== C | != C)*
      * C ::= D (< D | > D | <= D | >= D)*
      * D ::= E (+ E | - E)*
      * E ::= F (* F | / F | % F)*
      * F ::= num | string | true | false | null | (Expr) | -F | !F | 
-     * 		 new id( ArgList? ) | CallExpr | IfExpr | RefExpr
+     * 		 new id( ArgList? ) || id || id( ArgList? )
      */
     
     private Expression parseExpression() {
