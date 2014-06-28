@@ -160,6 +160,7 @@ public class Parser {
 	 * @throws SyntaxError	if expected token mismatches actual token
 	 */
 	private BlockStmt parseMainBlock() throws SyntaxError {
+		Line mainLine = token.line;
 		accept(TokenKind.KEYWORD, "main");
 		
 		StatementList mainBlockStatements = new StatementList();
@@ -168,7 +169,7 @@ public class Parser {
 		
 		accept(TokenKind.KEYWORD, "end");
 		
-		return new BlockStmt(mainBlockStatements, mainBlockStatements.get(0).line);
+		return new BlockStmt(mainBlockStatements, mainLine);
 	}
 	
 	/**
