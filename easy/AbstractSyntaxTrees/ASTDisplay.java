@@ -82,15 +82,10 @@ public class ASTDisplay implements Visitor<String, Object> {
 	public Object visitProgram(Program prog, String arg) {
 		show(arg, prog);
 		
-        StructDeclList structs 	   = prog.structDeclList;
         FunctionDeclList functions = prog.functionDeclList;
         BlockStmt mainBlock		   = prog.mainBlock;
         
         String prefix = arg + "  . ";
-        
-        show(arg, "  StructDeclList [" + structs.size() + "]");
-        for (StructDecl struct : structs)
-        	struct.visit(this, prefix);
         
         show(arg, "  FunctionDeclList [" + functions.size() + "]");
         for (FunctionDecl function : functions)
@@ -100,40 +95,6 @@ public class ASTDisplay implements Visitor<String, Object> {
         for (Statement statement : mainBlock.statementList)
         	statement.visit(this, prefix);
         
-        return null;
-	}
-
-	/**
-     * Print textual representation of a Struct Declaration
-     * 
-     * @param prog	the Struct Declaration
-     * @param arg	the prefix String 
-     */
-	@Override
-	public Object visitStructDecl(StructDecl sd, String arg) {		
-		show(arg, sd);
-		show(indent(arg), quote(sd.name) + " struct name");		
-		show(arg, "  FieldDeclList [" + sd.fieldDeclList.size() + "]");
-		
-		String prefix = arg + "  . ";
-		
-		for (FieldDecl field : sd.fieldDeclList)
-			field.visit(this, prefix);
-		
-		return null;
-	}
-
-	/**
-     * Print textual representation of a Field Declaration
-     * 
-     * @param prog	the Field Declaration
-     * @param arg	the prefix String 
-     */
-	@Override
-	public Object visitFieldDecl(FieldDecl fd, String arg) {
-		show(arg, "(" + (fd.isPrivate ? "private": "public") + (fd.isStatic ? " static) " :") ") + fd.toString());
-    	fd.type.visit(this, indent(arg));
-    	show(indent(arg), quote(fd.name) + " field name");
         return null;
 	}
 
@@ -202,19 +163,6 @@ public class ASTDisplay implements Visitor<String, Object> {
 	@Override
 	public Object visitBaseType(BaseType type, String arg) {
 		show(arg, type.typeKind + " " + type.toString());
-        return null;
-	}
-
-	/**
-     * Print textual representation of a Reference Type
-     * 
-     * @param prog	the Reference Type
-     * @param arg	the prefix String 
-     */
-	@Override
-	public Object visitRefType(RefType type, String arg) {
-		show(arg, type);
-        show(indent(arg), quote(type.typeName.spelling) + " struct name");
         return null;
 	}
 
@@ -499,29 +447,6 @@ public class ASTDisplay implements Visitor<String, Object> {
         expr.literal.visit(this, indent(arg));
         return null;
 	}
-
-	/**
-     * Print textual representation of a New Object Expression
-     * 
-     * @param prog	the New Object Expression
-     * @param arg	the prefix String 
-     */
-	@Override
-	public Object visitNewObjectExpr(NewObjectExpr expr, String arg) {
-		show(arg, expr);
-		
-        expr.refType.visit(this, indent(arg));
-        
-        ExprList args = expr.argList;
-        show(arg, "  ExprList + [" + args.size() + "]");
-        
-        String prefix = arg + "  . ";
-        
-        for (Expression argument: args)
-            argument.visit(this, prefix);
-        
-        return null;
-	}
 	
 	/**
      * Print textual representation of an IfExpr
@@ -538,20 +463,6 @@ public class ASTDisplay implements Visitor<String, Object> {
 		expr.elseExpr.visit(this, indent(arg));
 		
 		return null;
-	}
-
-	/**
-     * Print textual representation of a Qualified Reference
-     * 
-     * @param prog	the Qualified Reference
-     * @param arg	the prefix String 
-     */
-	@Override
-	public Object visitQualifiedRef(QualifiedRef ref, String arg) {
-		show(arg, ref);
-    	ref.id.visit(this, indent(arg));
-    	ref.ref.visit(this, indent(arg));
-	    return null;
 	}
 
 	/**
@@ -618,18 +529,6 @@ public class ASTDisplay implements Visitor<String, Object> {
 	}
 
 	/**
-     * Print textual representation of a Floating-Point Literal
-     * 
-     * @param prog	the Floating-Point Literal
-     * @param arg	the prefix String 
-     */
-	@Override
-	public Object visitFloatLiteral(FloatLiteral num, String arg) {
-		show(arg, quote(num.spelling) + " " + num.toString());
-		return null;
-	}
-
-	/**
      * Print textual representation of a Boolean Literal
      * 
      * @param prog	the Boolean Literal
@@ -652,11 +551,4 @@ public class ASTDisplay implements Visitor<String, Object> {
 		show(arg, quote(str.spelling) + " " + str.toString());
 		return null;
 	}
-
-	@Override
-	public Object visitReferenceLiteral(ReferenceLiteral reflit, String arg) {
-		show(arg, reflit.spelling);
-		return null;
-	}
-
 }

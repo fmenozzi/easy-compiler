@@ -16,15 +16,12 @@ public interface Visitor<ArgType, ResultType> {
 	public ResultType visitProgram(Program prog, ArgType arg);
 
 	// Declarations
-	public ResultType visitStructDecl(StructDecl sd, ArgType arg);
-	public ResultType visitFieldDecl(FieldDecl fd, ArgType arg);
 	public ResultType visitFunctionDecl(FunctionDecl fd, ArgType arg);
 	public ResultType visitParameterDecl(ParameterDecl pd, ArgType arg);
 	public ResultType visitVarDecl(VarDecl decl, ArgType arg);
 
 	// Types
 	public ResultType visitBaseType(BaseType type, ArgType arg);
-	public ResultType visitRefType(RefType type, ArgType arg);
 
 	// Statements
 	public ResultType visitBlockStmt(BlockStmt stmt, ArgType arg);
@@ -48,11 +45,9 @@ public interface Visitor<ArgType, ResultType> {
 	public ResultType visitRefExpr(RefExpr expr, ArgType arg);
 	public ResultType visitCallExpr(CallExpr expr, ArgType arg);
 	public ResultType visitLiteralExpr(LiteralExpr expr, ArgType arg);
-	public ResultType visitNewObjectExpr(NewObjectExpr expr, ArgType arg);
 	public ResultType visitIfExpr(IfExpr expr, ArgType arg);
 
 	// References
-	public ResultType visitQualifiedRef(QualifiedRef ref, ArgType arg);
 	public ResultType visitIndexedRef(IndexedRef ref, ArgType arg);
 	public ResultType visitIdRef(IdRef ref, ArgType arg);
 
@@ -60,8 +55,6 @@ public interface Visitor<ArgType, ResultType> {
 	public ResultType visitIdentifier(Identifier id, ArgType arg);
 	public ResultType visitOperator(Operator op, ArgType arg);
 	public ResultType visitIntLiteral(IntLiteral num, ArgType arg);
-	public ResultType visitFloatLiteral(FloatLiteral num, ArgType arg);
 	public ResultType visitBooleanLiteral(BooleanLiteral bool, ArgType arg);
-	public ResultType visitReferenceLiteral(ReferenceLiteral reflit, ArgType arg);
 	public ResultType visitStringLiteral(StringLiteral str, ArgType arg);
 }

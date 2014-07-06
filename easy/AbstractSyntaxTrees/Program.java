@@ -20,11 +20,6 @@ public class Program extends AST {
 	 * Function declared in the program
 	 */
 	public final FunctionDeclList functionDeclList;
-	
-	/** 
-	 * Structs declared in the program
-	 */
-	public final StructDeclList structDeclList;
 
 	/**
 	 * Construct a Program 
@@ -36,14 +31,12 @@ public class Program extends AST {
 	 */
 	public Program(BlockStmt mainBlock, 
 				   FunctionDeclList functionDeclList, 
-				   StructDeclList structDeclList, 
 				   Line line) {
 		
 		super(line);
 		
 		this.mainBlock = mainBlock;
 		this.functionDeclList = functionDeclList;
-		this.structDeclList = structDeclList;
 	}
 
 	/**

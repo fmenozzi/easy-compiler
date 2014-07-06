@@ -8,14 +8,14 @@ the pound sign and continue until the end of the line.
 
 The entry point for Easy programs is the main block, of
 which there can only be one. Outside of the main block, 
-you can declare any number of functions and structures, in
+you can declare any number of functions in
 any order.
 
 Semicolons at the end of statements are optional.
 
 Strings can begin with either a single or double quote
 
-Running this tutorial will print the integers 1 through 12
+Running this tutorial will print the integers 1 through 11
 ##
 
 main
@@ -88,25 +88,6 @@ main
    	int numToPrint = 11 if isEven else -1;
 	println(numToPrint);
 
-   	# 12. Structure instantiation
-   	SimpleObject obj = new SimpleObject(12, 0.5);
-   	if obj.integer equals 12 and obj.real < 1.0
-   		println(obj.integer);
-   	else
-   		println(-1);
-   	end
-
-end
-
-##
-Structs in Easy behave identically to structs in C, 
-with the added feature that the compiler supplies a 
-"constructor" for initializing the fields.
-##
-
-struct SimpleObject
-	int integer;
-	double real;
 end
 
 ##

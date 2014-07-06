@@ -126,21 +126,17 @@ public class Scanner {
 		this.reporter 	 = reporter;
 				
 		keywords = new HashSet<String>();
-		keywords.add("class");
-		keywords.add("struct");
 		keywords.add("function");
 		keywords.add("main");
 		keywords.add("end");
 		keywords.add("return");
-		keywords.add("public");
-		keywords.add("private");
-		keywords.add("static");
+		
+		//keywords.add("returns");
+		
 		keywords.add("int");
-		keywords.add("double");
 		keywords.add("boolean");
 		keywords.add("void");
 		keywords.add("mod");
-		keywords.add("this");
 		keywords.add("if");
 		keywords.add("else");
 		keywords.add("while");
@@ -153,7 +149,6 @@ public class Scanner {
 		keywords.add("to");
 		keywords.add("break");
 		keywords.add("new");
-		keywords.add("java");
 		
 		logops = new HashSet<String>();
 		logops.add("and");
@@ -204,8 +199,6 @@ public class Scanner {
 				return new Token(TokenKind.RELOP, word, new Line(lineNumber));
 			else if (word.equals("true") || word.equals("false"))
 				return new Token(TokenKind.BOOLLIT, word, new Line(lineNumber));
-			else if (word.equals("null")) 
-				return new Token(TokenKind.REFLIT, word, new Line(lineNumber));
 			else if (word.equals("mod"))
 				return new Token(TokenKind.ARITHOP, word, new Line(lineNumber));
 			else 
@@ -349,7 +342,9 @@ public class Scanner {
 				numstr += Character.toString(currentChar);
 				takeIt();
 			}
+			return new Token(TokenKind.INTLIT, numstr, new Line(lineNumber));
 			
+			/*
 			// Distinguish between ints and floats
 			if (currentChar == '.') {
 				takeIt();
@@ -368,7 +363,7 @@ public class Scanner {
 			} else {
 				return new Token(TokenKind.INTLIT, numstr, new Line(lineNumber));
 			}
-			
+			*/
 		case ';':
 			takeIt();
 			return new Token(TokenKind.SEMICOL, ";", new Line(lineNumber));

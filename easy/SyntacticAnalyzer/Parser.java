@@ -118,17 +118,13 @@ public class Parser {
 	 */
 	private Program parseProgram() throws SyntaxError {
 		FunctionDeclList fdl = new FunctionDeclList();
-		StructDeclList sdl   = new StructDeclList();
 		BlockStmt mainBlock  = null;
 		
 		while (! token.spelling.equals("main")) {
-			if (token.spelling.equals("function")) {
+			if (token.spelling.equals("function"))
 				fdl.add(parseFunctionDeclaration());
-			} else if (token.spelling.equals("struct")) {
-				sdl.add(parseStructDeclaration());
-			} else {
+			else
 				parseError(token.line.lineNumber, "Unrecognized token");
-			}
 			
 			if (token.kind == TokenKind.EOF)
 				parseError(token.line.lineNumber, "Missing main block");
@@ -139,18 +135,15 @@ public class Parser {
 		mainBlock = parseMainBlock();
 		
 		while (token.kind != TokenKind.EOF) {
-			if (token.spelling.equals("function")) {
+			if (token.spelling.equals("function"))
 				fdl.add(parseFunctionDeclaration());
-			} else if (token.spelling.equals("struct")) {
-				sdl.add(parseStructDeclaration());
-			} else {
+			else 
 				parseError(token.line.lineNumber, "Unrecognized token");
-			}
 		}
 		
 		accept(TokenKind.EOF);
 		
-		return new Program(mainBlock, fdl, sdl, mainLine);
+		return new Program(mainBlock, fdl, mainLine);
 	}
 	
 	/**
@@ -192,15 +185,11 @@ public class Parser {
 		Line functionLine = new Line(scanner.lineNumber());
 		accept(TokenKind.KEYWORD, "function");			// function
 		
-		if (token.spelling.equals("int")   ||
-			token.spelling.equals("float") ||
-			token.spelling.equals("boolean")) {			// int | float | boolean
+		if (token.spelling.equals("int") || token.spelling.equals("boolean")) {		// int | boolean
 			
 			String spelling = token.spelling;
 			if (spelling.equals("int"))
 				returnType = new BaseType(TypeKind.INT, returnType.line);
-			else if (spelling.equals("float"))
-				returnType = new BaseType(TypeKind.FLOAT, returnType.line);
 			else
 				returnType = new BaseType(TypeKind.BOOLEAN, returnType.line);
 			
@@ -210,20 +199,9 @@ public class Parser {
 			functionName = token.spelling;
 			
 			accept(TokenKind.IDEN);						// id
-		} else {	// id
-			Identifier id = new Identifier(token.spelling, token.line);
-			
-			acceptIt();									// id
-			
-			if (token.kind == TokenKind.ASSIGN) {
-				acceptIt();								// =
-				returnType = new RefType(id, id.line);
-				
-				functionName = token.spelling;
-				accept(TokenKind.IDEN);
-			} else {
-				functionName = id.spelling;
-			}
+		} else {	// No return type
+			functionName = token.spelling;
+			accept(TokenKind.IDEN);
 		}
 		
 		accept(TokenKind.LPAREN);						// (
@@ -241,51 +219,6 @@ public class Parser {
 	}
 	
 	/**
-	 * StructDecl ::= struct id FieldDecl FieldDecl* end
-	 * 
-	 * @return				the AST of the Structure Declaration
-	 * @throws SyntaxError	if expected token mismatches actual token
-	 */
-	private StructDecl parseStructDeclaration() throws SyntaxError {
-		Line structLine = new Line(scanner.lineNumber());
-		accept(TokenKind.KEYWORD, "struct");			// struct
-		
-		String structName = token.spelling;
-		accept(TokenKind.IDEN);							// id
-		
-		FieldDeclList fields = new FieldDeclList();
-		fields.add(parseFieldDecl());					// FieldDecl
-		while (! token.spelling.equals("end"))
-			fields.add(parseFieldDecl());				// FieldDecl*
-		
-		accept(TokenKind.KEYWORD, "end");				// end
-						
-		return new StructDecl(structName, fields, structLine);
-	}
-	
-	/**
-	 * FieldDecl ::= Type id;
-	 * 
-	 * @return				the AST of the Field Declaration
-	 * @throws SyntaxError	if expected token mismatches actual token
-	 */
-	private FieldDecl parseFieldDecl() throws SyntaxError {
-		Type fieldType = parseType();		// Type
-			
-		String fieldName = token.spelling;	
-		Line fieldLine   = token.line;
-		
-		accept(TokenKind.IDEN);				// id
-		
-		if (token.kind == TokenKind.SEMICOL) acceptIt();			// ;
-		
-		boolean isPrivate = false;
-		boolean isStatic  = false;
-		
-		return new FieldDecl(isPrivate, isStatic, fieldType, fieldName, fieldLine);
-	}
-	
-	/**
 	 * Type ::= PrimType | RefType
 	 * <p>
 	 * Type ::= int | float | boolean | void | id
@@ -300,17 +233,13 @@ public class Parser {
 		TypeKind typeKind   = null;
 		
 		if      (typeSpelling.equals("int")) 		typeKind = TypeKind.INT;
-		else if (typeSpelling.equals("float"))		typeKind = TypeKind.FLOAT;
 		else if (typeSpelling.equals("boolean"))	typeKind = TypeKind.BOOLEAN;
 		else if (typeSpelling.equals("void"))		typeKind = TypeKind.VOID;
-		else /* id */								typeKind = TypeKind.REF;
+		else parseError(typeLine.lineNumber, "Unknown type (somehow)");
 		
 		acceptIt();	
 		
-		if (typeKind == TypeKind.REF)
-			return new RefType(new Identifier(typeSpelling, typeLine), typeLine);
-		else
-			return new BaseType(typeKind, typeLine);
+		return new BaseType(typeKind, typeLine);
 	}
 	
 	/**
@@ -364,10 +293,9 @@ public class Parser {
 	 * @return				the AST of the Reference
 	 * @throws SyntaxError	if expected token mismatches actual token
 	 */
-    
-    // TODO May need to check back and adjust the creation of Qualified vs. Indexed references
-    
+        
     private Reference parseReference() throws SyntaxError {
+    	/*
     	Reference ref = parseBaseRef();
     	
     	while (token.kind == TokenKind.DOT) {
@@ -380,6 +308,9 @@ public class Parser {
     	}
     	
     	return ref;
+    	*/
+    	
+    	return parseBaseRef();
     }
     
     /**
@@ -388,9 +319,7 @@ public class Parser {
 	 * @return				the AST of the Reference
 	 * @throws SyntaxError	if expected token mismatches actual token
 	 */
-    
-    // TODO Should this include id( ArgList? ) also?
-    
+        
     private Reference parseBaseRef() throws SyntaxError {
     	IdRef idRef = new IdRef(new Identifier(token.spelling, token.line), token.line);
     	
@@ -485,7 +414,6 @@ public class Parser {
 
     			return new WhileStmt(condition, new BlockStmt(body, blockLine), whileLine);
     		} else if (token.spelling.equals("int")  ||
-    				token.spelling.equals("float")   ||
     				token.spelling.equals("boolean") ||
     				token.spelling.equals("void")) {
 
@@ -584,44 +512,15 @@ public class Parser {
     		} 
     	} else {	// id
     		Identifier typeId = new Identifier(token.spelling, new Line(scanner.lineNumber()));
-
     		accept(TokenKind.IDEN);
-    		if (token.kind == TokenKind.IDEN) {				// id id = Expression;
-    			String varName 	= token.spelling;
-    			Type varType 	= new RefType(typeId, new Line(scanner.lineNumber()));
-    			VarDecl decl	= new VarDecl(varType, varName, new Line(scanner.lineNumber()));
-
-    			accept(TokenKind.IDEN);
-    			accept(TokenKind.ASSIGN);
-
-    			Expression expr = parseExpression();
-
-    			if (token.kind == TokenKind.SEMICOL) acceptIt();
-
-    			return new VarDeclStmt(decl, expr, new Line(scanner.lineNumber()));
-    		} else if (token.kind == TokenKind.LBRACKET) { // id[Expr] (.id([Expr])?)* (= Expr; | (ArgList?);)
+    		
+    		if (token.kind == TokenKind.LBRACKET) { // id[Expr] (.id([Expr])?)* (= Expr; | (ArgList?);)
     			accept(TokenKind.LBRACKET);
 
     			IdRef idRef 	= new IdRef(typeId, new Line(scanner.lineNumber()));
     			Reference ref 	= new IndexedRef(idRef, parseExpression(), new Line(scanner.lineNumber()));
 
     			accept(TokenKind.RBRACKET);
-    			while (token.kind == TokenKind.DOT) {
-    				acceptIt();
-
-    				Identifier id = new Identifier(token.spelling, new Line(scanner.lineNumber()));
-    				accept(TokenKind.IDEN);
-    				if (token.kind == TokenKind.LBRACKET) {
-    					acceptIt();
-    					Expression expr = parseExpression();
-    					accept(TokenKind.RBRACKET);
-
-    					ref = new QualifiedRef(ref, id, new Line(scanner.lineNumber()));
-    					ref = new IndexedRef(ref, expr, new Line(scanner.lineNumber()));
-    				} else {
-    					ref = new QualifiedRef(ref, id, new Line(scanner.lineNumber()));
-    				}
-    			}
 
     			if (token.kind == TokenKind.ASSIGN) {
     				acceptIt();
@@ -630,45 +529,6 @@ public class Parser {
 
     				return new AssignStmt(ref, expr, new Line(scanner.lineNumber()));
     			} else {
-    				ExprList args = new ExprList();
-
-    				accept(TokenKind.LPAREN);
-    				if (token.kind != TokenKind.RPAREN)
-    					args = parseArgumentList();
-    				accept(TokenKind.RPAREN);
-
-    				if (token.kind == TokenKind.SEMICOL) acceptIt();
-
-    				return new CallStmt(ref, args, new Line(scanner.lineNumber()));
-    			}
-    		} else if (token.kind == TokenKind.DOT) { // id . (...I think) 
-    			Reference ref = new IdRef(typeId, new Line(scanner.lineNumber()));
-
-    			while (token.kind == TokenKind.DOT) {
-    				accept(TokenKind.DOT);
-
-    				Identifier id = new Identifier(token.spelling, new Line(scanner.lineNumber()));
-    				accept(TokenKind.IDEN);
-
-    				if (token.kind == TokenKind.LBRACKET) {
-    					accept(TokenKind.LBRACKET);
-    					Expression expr = parseExpression();
-    					accept(TokenKind.RBRACKET);
-
-    					ref = new QualifiedRef(ref, id, new Line(scanner.lineNumber()));
-    					ref = new IndexedRef(ref, expr, new Line(scanner.lineNumber()));
-    				} else {
-    					ref = new QualifiedRef(ref, id, new Line(scanner.lineNumber()));
-    				}
-    			}
-
-    			if (token.kind == TokenKind.ASSIGN) { // AssignStmt
-    				accept(TokenKind.ASSIGN);
-    				Expression expr = parseExpression();
-    				if (token.kind == TokenKind.SEMICOL) acceptIt();
-
-    				return new AssignStmt(ref, expr, new Line(scanner.lineNumber()));
-    			} else {								// CallStmt
     				ExprList args = new ExprList();
 
     				accept(TokenKind.LPAREN);
@@ -802,10 +662,6 @@ public class Parser {
     		IntLiteral lit = new IntLiteral(token.spelling, new Line(scanner.lineNumber()));
     		acceptIt();
     		return new LiteralExpr(lit, new Line(scanner.lineNumber()));
-    	} else if (token.kind == TokenKind.FLOATLIT) {
-    		FloatLiteral lit = new FloatLiteral(token.spelling, new Line(scanner.lineNumber()));
-    		acceptIt();
-    		return new LiteralExpr(lit, new Line(scanner.lineNumber()));
     	} else if (token.kind == TokenKind.STRLIT) {
     		StringLiteral lit = new StringLiteral(token.spelling, new Line(scanner.lineNumber()));
     		acceptIt();
@@ -814,26 +670,6 @@ public class Parser {
     		BooleanLiteral lit = new BooleanLiteral(token.spelling, new Line(scanner.lineNumber()));
     		acceptIt();
     		return new LiteralExpr(lit, new Line(scanner.lineNumber()));
-    	} else if (token.kind == TokenKind.REFLIT) {
-    		ReferenceLiteral reflit = new ReferenceLiteral(new Line(scanner.lineNumber()));
-    		acceptIt();
-    		return new LiteralExpr(reflit, new Line(scanner.lineNumber()));
-    	} else if (token.spelling.equals("new")) {
-    		Line newLine = token.line;
-    		
-    		accept(TokenKind.KEYWORD, "new");
-    		
-    		Identifier id = new Identifier(token.spelling, token.line);
-    		
-    		accept(TokenKind.IDEN);
-    		accept(TokenKind.LPAREN);
-    		
-    		ExprList args = new ExprList();
-    		if (token.kind != TokenKind.RPAREN)
-    			args = parseArgumentList();
-    		accept(TokenKind.RPAREN);
-    		
-    		return new NewObjectExpr(new RefType(id, id.line), args, newLine);
     	} else { // Reference (ArgList?)? 
     		Reference ref = parseReference();   
     		if (token.kind == TokenKind.LPAREN) {

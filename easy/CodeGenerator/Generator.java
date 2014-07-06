@@ -107,46 +107,9 @@ public class Generator implements Visitor<String, Object> {
 		
 		for (FunctionDecl function : prog.functionDeclList)
 			function.visit(this, tab(arg));
-		
-		for (StructDecl struct : prog.structDeclList)
-			struct.visit(this, tab(arg));
-		
+
 		writeln("}");
 		
-		return null;
-	}
-
-	@Override
-	public Object visitStructDecl(StructDecl sd, String arg) {
-		writeln(arg + "static class " + sd.name + " {");
-		
-		for (FieldDecl field : sd.fieldDeclList)
-			field.visit(this, tab(arg));
-		
-		// Create default constructor
-		write("\n" + tab(arg) + "public " + sd.name + "(");
-		for (int i = 0; i < sd.fieldDeclList.size(); i++) {
-			sd.fieldDeclList.get(i).type.visit(this, "");
-			write(" " + sd.fieldDeclList.get(i).name);
-			if (i < sd.fieldDeclList.size() - 1)
-				write(", ");
-		}
-		writeln(") {");
-		
-		for (FieldDecl field : sd.fieldDeclList)
-			writeln(tab(tab(arg)) + "this." + field.name + " = " + field.name + ";");
-		writeln(tab(arg) + "}");
-		
-		writeln(arg + "}\n");
-		
-		return null;
-	}
-
-	@Override
-	public Object visitFieldDecl(FieldDecl fd, String arg) {
-		write(arg + "public ");
-		fd.type.visit(this, arg);
-		writeln(" " + fd.name + ";");
 		return null;
 	}
 
@@ -180,12 +143,6 @@ public class Generator implements Visitor<String, Object> {
 
 	@Override
 	public Object visitBaseType(BaseType type, String arg) {
-		write(type.spelling);
-		return null;
-	}
-
-	@Override
-	public Object visitRefType(RefType type, String arg) {
 		write(type.spelling);
 		return null;
 	}
@@ -409,19 +366,6 @@ public class Generator implements Visitor<String, Object> {
 		expr.literal.visit(this, arg);
 		return null;
 	}
-
-	@Override
-	public Object visitNewObjectExpr(NewObjectExpr expr, String arg) {
-		write(arg + "new " + expr.refType.spelling + "(");
-		for (int i = 0; i < expr.argList.size(); i++) {
-			expr.argList.get(i).visit(this, "");
-			if (i < expr.argList.size() - 1)
-				write(", ");
-		}
-		write(")");
-			
-		return null;
-	}
 	
 	@Override
 	public Object visitIfExpr(IfExpr expr, String arg) {
@@ -432,12 +376,6 @@ public class Generator implements Visitor<String, Object> {
 		write(" : ");
 		expr.elseExpr.visit(this, "");
 		write(")");
-		return null;
-	}
-
-	@Override
-	public Object visitQualifiedRef(QualifiedRef ref, String arg) {
-		write(arg + ref.spelling);
 		return null;
 	}
 
@@ -487,12 +425,6 @@ public class Generator implements Visitor<String, Object> {
 	}
 
 	@Override
-	public Object visitFloatLiteral(FloatLiteral num, String arg) {
-		write(arg + num.spelling);
-		return null;
-	}
-
-	@Override
 	public Object visitBooleanLiteral(BooleanLiteral bool, String arg) {
 		write(arg + bool.spelling);
 		return null;
@@ -503,11 +435,4 @@ public class Generator implements Visitor<String, Object> {
 		write(arg + "\""+str.spelling+"\"");
 		return null;
 	}
-
-	@Override
-	public Object visitReferenceLiteral(ReferenceLiteral reflit, String arg) {
-		write(arg + reflit.spelling);
-		return null;
-	}
-
 }

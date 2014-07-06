@@ -10,8 +10,6 @@ package easy.AbstractSyntaxTrees;
 public enum TypeKind {
 	VOID,
 	INT,
-	FLOAT,
 	BOOLEAN,
-	REF,
 	ERROR;
 }
