@@ -504,6 +504,17 @@ public class Parser {
     			accept(TokenKind.KEYWORD, "end");			// end
 
     			return new UntilStmt(condition, new BlockStmt(body, blockLine), untilLine);
+    		} else if (token.spelling.equals("do")) {
+    			Line doIfLine = token.line;
+    			
+    			acceptIt();
+    			Statement thenStmt = parseStatement();
+    			accept(TokenKind.KEYWORD, "if");
+    			Expression condition = parseExpression();
+    			accept(TokenKind.KEYWORD, "else");
+    			Statement elseStmt = parseStatement();
+    			
+    			return new DoIfStmt(thenStmt, condition, elseStmt, doIfLine);
     		} else { // "break"
     			Line breakLine = token.line;
     			acceptIt();

@@ -137,6 +137,7 @@ public class Scanner {
 		keywords.add("boolean");
 		keywords.add("void");
 		keywords.add("mod");
+		keywords.add("do");
 		keywords.add("if");
 		keywords.add("else");
 		keywords.add("while");

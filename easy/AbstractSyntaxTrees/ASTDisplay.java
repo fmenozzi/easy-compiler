@@ -343,6 +343,21 @@ public class ASTDisplay implements Visitor<String, Object> {
         stmt.body.visit(this, indent(arg));
         return null;
 	}
+	
+	/**
+     * Print textual representation of a Do-If Statement
+     * 
+     * @param prog	the Do-If Statement
+     * @param arg	the prefix String 
+     */
+	@Override
+	public Object visitDoIfStmt(DoIfStmt stmt, String arg) {
+		show(arg, stmt);
+		stmt.thenStmt.visit(this, indent(arg));
+		stmt.condition.visit(this, indent(arg));
+		stmt.elseStmt.visit(this, indent(arg));
+		return null;
+	}
 
 	/**
      * Print textual representation of a Break Statement

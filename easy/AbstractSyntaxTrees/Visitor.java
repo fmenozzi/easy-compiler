@@ -36,6 +36,7 @@ public interface Visitor<ArgType, ResultType> {
 	public ResultType visitForEachStmt(ForEachStmt stmt, ArgType arg);
 	public ResultType visitInfiniteLoopStmt(InfiniteLoopStmt stmt, ArgType arg);
 	public ResultType visitUntilStmt(UntilStmt stmt, ArgType arg);
+	public ResultType visitDoIfStmt(DoIfStmt stmt, ArgType arg);
 	public ResultType visitBreakStmt(BreakStmt stmt, ArgType arg);
 	public ResultType visitReturnStmt(ReturnStmt stmt, ArgType arg);
 

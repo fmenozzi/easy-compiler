@@ -303,6 +303,18 @@ public class Generator implements Visitor<String, Object> {
 		
 		return null;
 	}
+	
+	@Override
+	public Object visitDoIfStmt(DoIfStmt stmt, String arg) {
+		write(arg + "if (");
+		stmt.condition.visit(this, "");
+		writeln(") { ");
+		stmt.thenStmt.visit(this, tab(arg));
+		writeln(arg + "} else { ");
+		stmt.elseStmt.visit(this, tab(arg));
+		writeln(arg + "}");
+		return null;
+	}
 
 	@Override
 	public Object visitBreakStmt(BreakStmt stmt, String arg) {

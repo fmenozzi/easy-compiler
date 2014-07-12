@@ -47,7 +47,7 @@ main
 	int i = 0;
 	while i < 5
 		i = i + 1;
-	    	x = i;
+	    x = i;
    	end
    	println(x);
 
@@ -81,12 +81,13 @@ main
 	println(i)
 
    	# 10. Simple function call (void)
-   	print_10();
+   	print_10()
 
    	# 11. Simple function call (non-void)
-   	boolean isEven = even(10);
-   	int numToPrint = 11 if isEven else -1;
-	println(numToPrint);
+   	boolean isEven = even(10)
+   	int numToPrint = 11 if isEven else -1
+	do println(numToPrint) if isEven else println("How?")
+
 
 end
 
