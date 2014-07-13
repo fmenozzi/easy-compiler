@@ -10,6 +10,7 @@ package easy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import easy.ErrorReporter;
@@ -46,10 +47,26 @@ public class easyc {
 		if (reporter.hasErrors()) {
 			reporter.reportErrors();
 			System.exit(4);
-		} else {						
+		} else {	
+			// Generate .java file
 			String sourceFileNameBeforeDot = args[0].substring(0, args[0].indexOf("."));
-			new Generator(new File(sourceFileNameBeforeDot + ".java")).generate(ast);
+			File outputJavaFile = new File(sourceFileNameBeforeDot + ".java");
+			new Generator(outputJavaFile).generate(ast);
+			
+			// Compile .java file
+			try {
+				Runtime.getRuntime().exec("javac " + outputJavaFile.getAbsolutePath());
+			} catch (IOException e) {
+				System.err.println("Unable to invoke Java compiler javac");
+				e.printStackTrace();
+			}
+			
+			System.out.println();
+			System.out.println(" _____  _   _  _____  _____    _    _  _____  _____    _____  _____  _____  _   _  _ ");
+			System.out.println("(_   _)( )_( )(  _  )(_   _)  ( )  ( )(  _  )(  ___)  (  ___)(  _  )(  ___)( )_( )| |");
+			System.out.println("  ( )  (  _  )( (_) )  ( )    ( )()( )( (_) )(___  )  (  ___)( (_) )(___  ) (   ) |_|");
+			System.out.println("  (_)  (_) (_)(_) (_)  (_)     (_)(_) (_) (_)(_____)  (_____)(_) (_)(_____)  (_)  (_)");
+			System.out.println();
 		}
 	}
-	
 }
