@@ -34,7 +34,7 @@ public class Generator implements Visitor<String, Object> {
 	public Generator(File file) {
 		try {
 			writer = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
-			filename = file.getName().substring(0, file.getName().indexOf("."));
+			filename = file.getName().substring(0, file.getName().indexOf(".java"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

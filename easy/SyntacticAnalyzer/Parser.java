@@ -121,7 +121,7 @@ public class Parser {
 		BlockStmt mainBlock  = null;
 		
 		while (! token.spelling.equals("main")) {
-			if (token.spelling.equals("function"))
+			if (token.spelling.equals("def"))
 				fdl.add(parseFunctionDeclaration());
 			else
 				parseError(token.line.lineNumber, "Unrecognized token");
@@ -135,7 +135,7 @@ public class Parser {
 		mainBlock = parseMainBlock();
 		
 		while (token.kind != TokenKind.EOF) {
-			if (token.spelling.equals("function"))
+			if (token.spelling.equals("def"))
 				fdl.add(parseFunctionDeclaration());
 			else 
 				parseError(token.line.lineNumber, "Unrecognized token");
@@ -166,62 +166,44 @@ public class Parser {
 	}
 	
 	/**
-	 * FunctionDecl ::= function (Type =)? id( ParamList? ) Statement end
-	 * <p>
-	 * FunctionDecl ::= function ((int | float | boolean | id) =)? id( ParamList? ) Statement end
+	 * FunctionDecl ::= def id( ParamList? ) (returns Type)? Statement end
 	 * 
 	 * @return				the AST of the Function Declarations
 	 * @throws SyntaxError	if expected token mismatches actual token
 	 */
 	
 	private FunctionDecl parseFunctionDeclaration() throws SyntaxError {
+		Line functionLine = token.line;
+		accept(TokenKind.KEYWORD, "def");
 		
-		// Default values for function
-		String functionName		 = "";
-		Type returnType 		 = new BaseType(TypeKind.VOID, new Line(scanner.lineNumber()));
+		String functionName = token.spelling;
+		accept(TokenKind.IDEN);
+		
+		accept(TokenKind.LPAREN);
 		ParameterDeclList params = new ParameterDeclList();
-		StatementList body 		 = new StatementList();
+		if (token.kind != TokenKind.RPAREN)
+			params = parseParameterList();
+		accept(TokenKind.RPAREN);
 		
-		Line functionLine = new Line(scanner.lineNumber());
-		accept(TokenKind.KEYWORD, "function");			// function
-		
-		if (token.spelling.equals("int") || token.spelling.equals("boolean")) {		// int | boolean
-			
-			String spelling = token.spelling;
-			if (spelling.equals("int"))
-				returnType = new BaseType(TypeKind.INT, returnType.line);
-			else
-				returnType = new BaseType(TypeKind.BOOLEAN, returnType.line);
-			
+		Type returnType = new BaseType(TypeKind.VOID, new Line(scanner.lineNumber()));	// Defaults to void
+		if (token.spelling.equals("returns")) {
 			acceptIt();
-			accept(TokenKind.ASSIGN);					// =
-			
-			functionName = token.spelling;
-			
-			accept(TokenKind.IDEN);						// id
-		} else {	// No return type
-			functionName = token.spelling;
-			accept(TokenKind.IDEN);
+			returnType = parseType();
 		}
 		
-		accept(TokenKind.LPAREN);						// (
-		if (token.kind != TokenKind.RPAREN)
-			params = parseParameterList();				// ParamList?
-		accept(TokenKind.RPAREN);						// )
-		
+		StatementList body = new StatementList();
 		Line blockLine = token.line;
 		while (! token.spelling.equals("end"))
-			body.add(parseStatement());					// Statement
-		
-		accept(TokenKind.KEYWORD, "end");				// end
+			body.add(parseStatement());					
+		accept(TokenKind.KEYWORD, "end");	
 		
 		return new FunctionDecl(functionName, returnType, params, new BlockStmt(body, blockLine), functionLine);
 	}
 	
 	/**
-	 * Type ::= PrimType | RefType
+	 * Type ::= PrimType
 	 * <p>
-	 * Type ::= int | float | boolean | void | id
+	 * Type ::= Int | Boolean
 	 * 
 	 * @return				the AST of the Type
 	 * @throws SyntaxError	if expected token mismatches actual token
@@ -232,9 +214,8 @@ public class Parser {
 		
 		TypeKind typeKind   = null;
 		
-		if      (typeSpelling.equals("int")) 		typeKind = TypeKind.INT;
-		else if (typeSpelling.equals("boolean"))	typeKind = TypeKind.BOOLEAN;
-		else if (typeSpelling.equals("void"))		typeKind = TypeKind.VOID;
+		if      (typeSpelling.equals("Int")) 		typeKind = TypeKind.INT;
+		else if (typeSpelling.equals("Boolean"))	typeKind = TypeKind.BOOLEAN;
 		else parseError(typeLine.lineNumber, "Unknown type (somehow)");
 		
 		acceptIt();	
@@ -243,7 +224,7 @@ public class Parser {
 	}
 	
 	/**
-	 * ParameterList ::= Type id (, Type id)*
+	 * ParameterList ::= id = Type (, id = Type)*
 	 * 
 	 * @return				the AST of the Parameter List
 	 * @throws SyntaxError	if expected token mismatches actual token
@@ -251,22 +232,24 @@ public class Parser {
     private ParameterDeclList parseParameterList() throws SyntaxError {
     	ParameterDeclList pdl = new ParameterDeclList();
     	
-    	Type varType 	= parseType();		// Type
-    	String varName 	= token.spelling;
+    	String paramName = token.spelling;
+    	accept(TokenKind.IDEN);
+		accept(TokenKind.ASSIGN);
+		Type paramType = parseType();
+		
+		pdl.add(new ParameterDecl(paramType, paramName, new Line(scanner.lineNumber())));
     	
-    	accept(TokenKind.IDEN);				// id
-    	
-    	pdl.add(new ParameterDecl(varType, varName, new Line(scanner.lineNumber())));
-    	
-    	while (token.kind == TokenKind.COMMA) {
-    		accept(TokenKind.COMMA);		// ,
+		while (token.kind == TokenKind.COMMA) {
+    		accept(TokenKind.COMMA);
     		
-    		varType = parseType();			// Type
-        	varName = token.spelling;	
-        	accept(TokenKind.IDEN);			// id
+    		paramName = token.spelling;
+    		accept(TokenKind.IDEN);
+    		accept(TokenKind.ASSIGN);
+    		paramType = parseType();
     		
-    		pdl.add(new ParameterDecl(varType, varName, new Line(scanner.lineNumber())));
-    	}
+    		pdl.add(new ParameterDecl(paramType, paramName, new Line(scanner.lineNumber())));
+    		
+     	} 
     	
     	return pdl;
     }
@@ -295,21 +278,6 @@ public class Parser {
 	 */
         
     private Reference parseReference() throws SyntaxError {
-    	/*
-    	Reference ref = parseBaseRef();
-    	
-    	while (token.kind == TokenKind.DOT) {
-    		acceptIt();
-    		
-    		Identifier id = new Identifier(token.spelling, token.line);
-    		accept(TokenKind.IDEN);
-    		
-      		ref = new QualifiedRef(ref, id, id.line);
-    	}
-    	
-    	return ref;
-    	*/
-    	
     	return parseBaseRef();
     }
     
@@ -344,7 +312,6 @@ public class Parser {
 	 * 				if Expr Statement (else if cond Statement)* (else Statement)? end <p> 
 	 * 				while Expression Statement end <p> 
 	 * 				return Expression; <p>
-	 * 				java JavaStmt JavaStmt* end
 	 * 
 	 * @return				the AST of the Reference
 	 * @throws SyntaxError	if expected token mismatches actual token
@@ -413,9 +380,7 @@ public class Parser {
     			accept(TokenKind.KEYWORD, "end");			// end
 
     			return new WhileStmt(condition, new BlockStmt(body, blockLine), whileLine);
-    		} else if (token.spelling.equals("int")  ||
-    				token.spelling.equals("boolean") ||
-    				token.spelling.equals("void")) {
+    		} else if (token.spelling.equals("Int") || token.spelling.equals("Boolean")) {
 
     			VarDecl decl = new VarDecl(parseType(), token.spelling, token.line);
 

@@ -20,11 +20,13 @@ Running this tutorial will print the integers 1 through 11
 
 main
 
+	println('Tutorial output...')
+
 	# 1. Simple println
 	println(1);
 
 	# 2. Simple literal
-	int x = 2;
+	Int x = 2;
 	println(x);
 
 	# 3. Simple expression
@@ -44,7 +46,7 @@ main
 	println(x);
 
 	# 5. While loop
-	int i = 0;
+	Int i = 0;
 	while i < 5
 		i = i + 1;
 	    x = i;
@@ -52,13 +54,13 @@ main
    	println(x);
 
    	# 6. For loop
-   	for int j from 1 to 6
+   	for Int j from 1 to 6
    		x = j;
    	end
    	println(x);
 
    	# 7. Another For loop
-   	for int j from 1 to 7 by 2
+   	for Int j from 1 to 7 by 2
    		x = j;
    	end
    	println(x);
@@ -84,10 +86,11 @@ main
    	print_10()
 
    	# 11. Simple function call (non-void)
-   	boolean isEven = even(10)
-   	int numToPrint = 11 if isEven else -1
+   	Boolean isEven = even(10)
+   	Int numToPrint = 11 if isEven else -1
 	do println(numToPrint) if isEven else println("How?")
 
+	println('Done')
 
 end
 
@@ -97,10 +100,10 @@ the sense that they are free-floating and not tied to a
 particular object (unlike methods). 
 ##
 
-function print_10()
+def print_10()
 	println(10);
 end
 
-function boolean = even(int num)
+def even(num = Int) returns Boolean
 	return num mod 2 equals 0;
 end

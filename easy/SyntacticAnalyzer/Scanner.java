@@ -126,16 +126,13 @@ public class Scanner {
 		this.reporter 	 = reporter;
 				
 		keywords = new HashSet<String>();
-		keywords.add("function");
+		keywords.add("def");
 		keywords.add("main");
 		keywords.add("end");
 		keywords.add("return");
-		
-		//keywords.add("returns");
-		
-		keywords.add("int");
-		keywords.add("boolean");
-		keywords.add("void");
+		keywords.add("returns");
+		keywords.add("Int");
+		keywords.add("Boolean");
 		keywords.add("mod");
 		keywords.add("do");
 		keywords.add("if");
@@ -149,7 +146,6 @@ public class Scanner {
 		keywords.add("by");
 		keywords.add("to");
 		keywords.add("break");
-		keywords.add("new");
 		
 		logops = new HashSet<String>();
 		logops.add("and");

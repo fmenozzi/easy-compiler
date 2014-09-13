@@ -15,6 +15,8 @@ public class ErrorReporter {
 	 */
 	private ArrayList<String> scanErrors;
 	private ArrayList<String> parseErrors;
+	private ArrayList<String> idErrors;
+	private ArrayList<String> typeErrors;
 	
 	/**
 	 * Default constructor that initializes error lists
@@ -22,6 +24,8 @@ public class ErrorReporter {
 	public ErrorReporter() {
 		scanErrors	= new ArrayList<String>();
 		parseErrors	= new ArrayList<String>();
+		idErrors 	= new ArrayList<String>();
+		typeErrors	= new ArrayList<String>();
 	}
 	
 	/**
@@ -43,12 +47,21 @@ public class ErrorReporter {
 	}
 	
 	/**
+	 * Add an ID error to the list of ID errors
+	 * 
+	 * @param message
+	 */
+	public void addIdError(int lineNumber, String message) {
+		parseErrors.add("At line " + lineNumber + ": " + message);
+	}
+	
+	/**
 	 * Determine whether the reporter currently has any errors
 	 * 
 	 * @return	whether the reporter currently has any errors
 	 */
 	public boolean hasErrors() {
-		return	hasScanErrors() || hasParseErrors();
+		return hasScanErrors() || hasParseErrors();
 	}
 	
 	private boolean hasScanErrors() {

@@ -49,10 +49,16 @@ public class easyc {
 			System.exit(4);
 		} else {	
 			// Generate .java file
-			String sourceFileNameBeforeDot = args[0].substring(0, args[0].indexOf("."));
+			int easyIndex = args[0].indexOf(".easy");
+			if (easyIndex == -1) {
+				System.err.println("File must end in \".easy\"");
+				System.exit(4);
+			}
+			
+			String sourceFileNameBeforeDot = args[0].substring(0, easyIndex);
 			File outputJavaFile = new File(sourceFileNameBeforeDot + ".java");
 			new Generator(outputJavaFile).generate(ast);
-			
+					
 			// Compile .java file
 			try {
 				Runtime.getRuntime().exec("javac " + outputJavaFile.getAbsolutePath());
