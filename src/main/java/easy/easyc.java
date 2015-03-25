@@ -29,7 +29,7 @@ public class easyc {
 		InputStream inputStream = null;
 		if (args.length != 1) {
 			System.out.println("Usage: java -jar path/to/easyc.java path/to/source.easy");
-			System.exit(1);
+			System.exit(0);
 		} else {
 			try {
 				inputStream = new FileInputStream(args[0]);
@@ -49,9 +49,9 @@ public class easyc {
 			System.exit(4);
 		} else {	
 			// Generate .java file
-			int easyIndex = args[0].indexOf(".easy");
+			int easyIndex = args[0].indexOf(".ez");
 			if (easyIndex == -1) {
-				System.err.println("File must end in \".easy\"");
+				System.err.println("File must end in \".ez\"");
 				System.exit(4);
 			}
 			
