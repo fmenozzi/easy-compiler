@@ -11,12 +11,6 @@ jar {
     }
 }
 
-run {
-	if (project.hasProperty("appArgs")) {
-		args Eval.me(appArgs)
-	}
-}
-
 task wrapper (type: Wrapper) {
 	gradleVersion = '2.3'
 }
