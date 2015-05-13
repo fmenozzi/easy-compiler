@@ -23,6 +23,8 @@ import easy.AbstractSyntaxTrees.AST;
 import easy.CodeGenerator.Generator;
 
 public class easyc {
+	
+	static ErrorReporter reporter;
 
 	public static void main(String[] args) {
 				
@@ -39,40 +41,54 @@ public class easyc {
 			}		
 		}
 		
-		ErrorReporter reporter	= new ErrorReporter();
-		Scanner scanner 		= new Scanner(inputStream, reporter);
+		reporter = new ErrorReporter();
+		Scanner scanner = new Scanner(inputStream, reporter);
 
 		AST ast = new Parser(scanner, reporter).parse();
 		
+		checkForErrors();
+		File outputJavaFile = generateJavaSource(args[0], ast);
+		compileJavaSource(outputJavaFile);
+		printSuccessMessage();			
+	}
+	
+	private static void checkForErrors() {
 		if (reporter.hasErrors()) {
 			reporter.reportErrors();
 			System.exit(4);
-		} else {	
-			// Generate .java file
-			int easyIndex = args[0].indexOf(".ez");
-			if (easyIndex == -1) {
+		}
+	}
+	
+	private static File generateJavaSource(String fileName, AST ast) {
+		int easyIndex = fileName.indexOf(".ez");
+		if (easyIndex == -1) {
 				System.err.println("File must end in \".ez\"");
 				System.exit(4);
-			}
-			
-			String sourceFileNameBeforeDot = args[0].substring(0, easyIndex);
-			File outputJavaFile = new File(sourceFileNameBeforeDot + ".java");
-			new Generator(outputJavaFile).generate(ast);
-					
-			// Compile .java file
-			try {
-				Runtime.getRuntime().exec("javac " + outputJavaFile.getAbsolutePath());
-			} catch (IOException e) {
-				System.err.println("Unable to invoke Java compiler javac");
-				e.printStackTrace();
-			}
-			
-			System.out.println();
-			System.out.println(" _____  _   _  _____  _____    _    _  _____  _____    _____  _____  _____  _   _  _ ");
-			System.out.println("(_   _)( )_( )(  _  )(_   _)  ( )  ( )(  _  )(  ___)  (  ___)(  _  )(  ___)( )_( )| |");
-			System.out.println("  ( )  (  _  )( (_) )  ( )    ( )()( )( (_) )(___  )  (  ___)( (_) )(___  ) (   ) |_|");
-			System.out.println("  (_)  (_) (_)(_) (_)  (_)     (_)(_) (_) (_)(_____)  (_____)(_) (_)(_____)  (_)  (_)");
-			System.out.println();
 		}
+		
+		String sourceFileNameBeforeDot = fileName.substring(0, easyIndex);
+		File outputJavaFile = new File(sourceFileNameBeforeDot + ".java");
+		new Generator(outputJavaFile).generate(ast);
+		
+		return outputJavaFile;
+	}
+	
+	private static void compileJavaSource(File sourceFile) {
+		try {
+			Runtime.getRuntime().exec("javac " + sourceFile.getAbsolutePath());
+		} catch (IOException e) {
+			System.err.println("Unable to invoke Java compiler javac");
+			e.printStackTrace();
+			System.exit(4);
+		}
+	}
+	
+	private static void printSuccessMessage() {
+		System.out.println();
+		System.out.println(" _____  _   _  _____  _____    _    _  _____  _____    _____  _____  _____  _   _  _ ");
+		System.out.println("(_   _)( )_( )(  _  )(_   _)  ( )  ( )(  _  )(  ___)  (  ___)(  _  )(  ___)( )_( )| |");
+		System.out.println("  ( )  (  _  )( (_) )  ( )    ( )()( )( (_) )(___  )  (  ___)( (_) )(___  ) (   ) |_|");
+		System.out.println("  (_)  (_) (_)(_) (_)  (_)     (_)(_) (_) (_)(_____)  (_____)(_) (_)(_____)  (_)  (_)");
+		System.out.println();	
 	}
 }
